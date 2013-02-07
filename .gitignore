@@ -1,0 +1,22 @@
+# hidden directories
+.*
+!.gitignore
+!.gitmodules
+
+# temporary files
+*.tmp
+*.tuc
+*.aux
+*.blg
+*.bbl
+*.log
+
+# temporary directories created during compilation
+/tmp
+
+# Editor leftovers
+.*.swp
+.~
+
+# compiled binaries
+*.pdf

@@ -1,0 +1,182 @@
+%D \module
+%D   [     file=t-slide,
+%D      version=2012.11.12,
+%D        title=\CONTEXT\ User Module,
+%D     subtitle=Slide,
+%D       author=Marco Patzer,
+%D         date=\currentdate,
+%D    copyright=Marco Patzer,
+%D      license=GNU General Public License]
+
+%C Copyright (C) 2012  Marco Patzer
+%C
+%C This program is free software: you can redistribute it and/or modify
+%C it under the terms of the GNU General Public License as published by
+%C the Free Software Foundation, either version 3 of the License, or
+%C any later version.
+
+\writestatus{loading}{ConTeXt User Module / Slide MetaPost definitions}
+
+\startmodule [slide-mp]
+
+\unprotect
+
+\defineMPinstance
+	[\c!slide]
+	[metafun]
+
+\startMPdefinitions{\c!slide}
+	boolean blockshading; blockshading := true;
+\stopMPdefinitions
+
+\startuseMPgraphic{slide::mp:shading:overlay}
+	path p; p:=fullsquare xyscaled (\overlaywidth, \overlayheight);
+	fill p
+		withshading("linear", ulcorner p, llcorner p)
+		withfromshadecolor \MPcolor{\overlaycolor}
+		withtoshadecolor   \MPcolor{c:transparent};
+\stopuseMPgraphic
+
+\startuseMPgraphic{slide::mp:block:title}
+	offset := \moduleparameter{slide}{radius};
+	path p; p :=
+		origin                                      -- (\overlaywidth, 0)                     --
+		(\overlaywidth, \overlayheight-offset) {up} .. (\overlaywidth-offset, \overlayheight) --
+		(offset, \overlayheight) {left}             .. (0, \overlayheight-offset)             --
+		origin                                      .. cycle;
+
+	fill p
+		if blockshading :
+			withshading("linear", ulcorner p, llcorner p)
+			withfromshadecolor \MPcolor{\overlaycolor}
+			withtoshadecolor   \MPcolor{block:background}
+		else :
+			withcolor \MPcolor{\overlaycolor}
+		fi;
+\stopuseMPgraphic
+
+\startuseMPgraphic{slide::mp:dropshadow:common}
+	w      := \overlaywidth-.5pt;
+	h      := \overlayheight-.5pt;
+	radius := \framedparameter{radius};
+	radius := \moduleparameter{slide}{radius};
+
+	color col;
+	col := .05[\MPcolor{block:shadow}, black];
+
+	pair ll, lr, ur;
+	ll := -.5(w,  h);
+	lr :=  .5(w, -h);
+	ur :=  .5(w,  h);
+
+	path bborig;
+	bborig := fullsquare xyscaled (w, h);
+
+	path bottom_left, bottom_middle, corner, right_middle, right_bottomfull, right_top, right_topfull;
+
+	bottom_left = ll + (radius, 0) -- ll + (2radius, 0) --
+	ll + (radius + radius, -radius) {left} .. cycle;
+
+	bottom_middle = ll + (2radius, 0) -- lr + (-radius, 0) --
+		lr+ (-radius, -radius) -- ll + (2radius, -radius) .. cycle;
+
+	corner = lr + (-radius, 0) -- lr + (-radius, -radius) {right} ..
+		lr + (radius, radius) -- lr + (0, radius) {down} .. cycle;
+
+	right_middle = lr + (0, radius) -- lr + (radius, radius) --
+		ur + (radius, -2radius) -- ur + (0, -2radius) .. cycle;
+
+	right_bottomfull = lr -- lr + (radius, 0) --
+		ur + (radius, -2radius) -- ur + (0, -2radius) .. cycle;
+
+	right_top = ur + (0, -radius-radius) -- ur + (radius, -2radius) {up} ..
+		ur + (0, -radius) -- cycle;
+
+	right_topfull = lr + (0, radius) -- lr + (radius, radius) --
+		ur + (radius, 0) -- ur .. cycle;
+\stopuseMPgraphic
+
+\startuseMPgraphic{slide::mp:dropshadow:toppart}
+
+	\includeMPgraphic{slide::mp:dropshadow:common}
+
+	fill right_bottomfull
+		withshading("linear", llcorner right_bottomfull, lrcorner right_bottomfull)
+		withfromshadecolor col
+		withtoshadecolor   \MPcolor{c:transparent};
+
+	fill right_top
+		withshading("circular", llcorner right_top, llcorner right_top, radius, 0)
+		withfromshadecolor \MPcolor{c:transparent}
+		withtoshadecolor   col;
+
+	setbounds currentpicture to bborig;
+\stopuseMPgraphic
+
+\startuseMPgraphic{slide::mp:dropshadow:bottompart}
+
+	\includeMPgraphic{slide::mp:dropshadow:common}
+
+	fill bottom_left
+		withshading("circular", urcorner bottom_left, urcorner bottom_left, radius, 0)
+		withfromshadecolor \MPcolor{c:transparent}
+		withtoshadecolor   col;
+
+	fill bottom_middle
+		withshading("linear", ulcorner bottom_middle, llcorner bottom_middle)
+		withfromshadecolor col
+		withtoshadecolor   \MPcolor{c:transparent};
+
+	fill corner
+		withshading("circular", ulcorner corner, ulcorner corner, 2radius, radius)
+		withfromshadecolor \MPcolor{c:transparent}
+		withtoshadecolor   col;
+
+	fill right_topfull
+		withshading("linear", llcorner right_topfull, lrcorner right_topfull)
+		withfromshadecolor col
+		withtoshadecolor   \MPcolor{c:transparent};
+
+	fill right_top
+		withshading("circular", llcorner right_top, llcorner right_top, radius, 0)
+		withfromshadecolor \MPcolor{c:transparent}
+		withtoshadecolor   col;
+
+	setbounds currentpicture to bborig;
+\stopuseMPgraphic
+
+\startuseMPgraphic{slide::mp:dropshadow:full}
+
+	\includeMPgraphic{slide::mp:dropshadow:common}
+
+	fill bottom_left
+		withshading("circular", urcorner bottom_left, urcorner bottom_left, radius, 0)
+		withfromshadecolor \MPcolor{c:transparent}
+		withtoshadecolor   col;
+
+	fill bottom_middle
+		withshading("linear", ulcorner bottom_middle, llcorner bottom_middle)
+		withfromshadecolor col
+		withtoshadecolor   \MPcolor{c:transparent};
+
+	fill corner
+		withshading("circular", ulcorner corner, ulcorner corner, 2radius, radius)
+		withfromshadecolor \MPcolor{c:transparent}
+		withtoshadecolor   col;
+
+	fill right_middle
+		withshading("linear", llcorner right_middle, lrcorner right_middle)
+		withfromshadecolor col
+		withtoshadecolor   \MPcolor{c:transparent};
+
+	fill right_top
+		withshading("circular", llcorner right_top, llcorner right_top, radius, 0)
+		withfromshadecolor \MPcolor{c:transparent}
+		withtoshadecolor   col;
+
+	setbounds currentpicture to bborig;
+\stopuseMPgraphic
+
+\protect
+
+\stopmodule

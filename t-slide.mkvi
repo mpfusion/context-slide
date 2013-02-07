@@ -1,0 +1,669 @@
+%D \module
+%D   [     file=t-slide,
+%D      version=2012.11.12,
+%D        title=\CONTEXT\ User Module,
+%D     subtitle=Slide,
+%D       author=Marco Patzer,
+%D         date=\currentdate,
+%D    copyright=Marco Patzer,
+%D      license=GNU General Public License]
+
+%C Copyright (C) 2012  Marco Patzer
+%C
+%C This program is free software: you can redistribute it and/or modify
+%C it under the terms of the GNU General Public License as published by
+%C the Free Software Foundation, either version 3 of the License, or
+%C any later version.
+
+%M \setupinteraction [focus=standard]
+%M \placecontent
+%D \startsection [title=Foreword]
+%D
+%D This module is inspired by the LaTeX packet \type{beamer} using the theme
+%D \quotation{Singapore} and the colour theme \quotation{crane}. It features a
+%D small interactive navigation bar at the top, which guides the listeners and
+%D replaces the ubiquitous, but boring \quotation{Table of Contents} slide.
+%D
+%D The module is not meant to be configurable. However, small changes to the
+%D layout can be made using the command \tex{setupmodule}.
+%D
+%D \startsection [title=Module setup]
+
+\writestatus{loading}{ConTeXt User Module / Slide}
+
+\startmodule [slide]
+
+\unprotect
+
+\startinterface all
+	\setinterfaceconstant {blockshading} {blockshading}
+	\setinterfaceconstant {shadow}       {shadow}
+	\setinterfaceconstant {slide}        {slide}
+\stopinterface
+
+%D Include the MetaPost graphics used by this module. They are are located
+%D from a different file.
+
+\usemodule [slide-mp]
+
+%D \useURL[title] [https://bitbucket.org/wolfs/title] [] [title module]
+%D \useURL[annotation] [https://bitbucket.org/wolfs/annotation] [] [annotation module]
+%D
+%D Input Wolfgangs \from[title] and \from[annotation]. Both modules
+%D are included in ConTeXt standalone.
+
+\usemodule [title]
+\usemodule [annotation]
+
+%D \stopsection
+
+\setupmodule
+	[\c!style=\v!sans,
+	 \c!size=17pt,
+	 \c!palet=orange,
+	 \c!shadow=\v!yes,
+	 \c!blockshading=\v!yes,
+	 \c!radius=2.5mm]
+
+%D The following settings should be overridden by the user. They end up on the
+%D title page and in the PDF meta data.
+
+\setupdocument
+	[\c!title={Set a title with \type{\setupdocument}\crlf\type{[title=My Title]}},
+	 \c!date=\currentdate]
+
+%D Hard coding the values is ugly and not very flexible. A proper solution
+%D would be to set the values based on the selected font size.
+
+\definemeasure
+	[tocbar:section:height]
+	[18pt]
+
+\definemeasure
+	[slide:title:height]
+	[48pt]
+
+%D \stopsection
+
+%D \startsection [title=Language and date]
+%D
+%D Date according to ISO 8601
+
+\setuplanguage
+	[en]
+	[\c!date={\v!year, \thinspace–\thinspace, mm, \thinspace–\thinspace, dd}]
+
+%D \stopsection
+
+%D \startsection [title=Page layout]
+%D
+%D Set the proper paper size for slides
+
+\setuppapersize
+	[S6]
+
+\setuplayout
+	[\c!header=\zeropoint,
+	 \c!backspace=.04\paperwidth,
+	 \c!height=.8\paperheight,
+	 \c!width=\v!middle,
+	 \c!margin=\zeropoint,
+	 \c!topspace=.15\paperwidth]
+
+%D Page numbering is suppressed on the title page.
+
+\setuppagenumbering
+	[\c!state=\v!off]
+
+\setupbackgrounds
+	[\c!page]
+	[\c!background={\c!color, layer:top:shading, layer:toc:section, layer:slidetitle},
+	 \c!setups={layer:toc:section:setups, layer:slidetitle:setups},
+	 \c!backgroundcolor=slide:background]
+
+%D \stopsection
+
+%D \startsection [title=Colour definitions]
+%D
+%D The transparent colour is used for the shading. Since the page background
+%D can be set to any colour, the most flexible way is to shade from the
+%D shading colour to transparent. This way non-uniform page backgrounds are
+%D supported as well.
+
+\definecolor
+	[c:transparent]
+	[\c!a=darken, \c!t=1, \c!s=1]
+
+\definecolor
+	[orange]
+	[\c!x=FCBB06]
+
+\definecolor
+	[lightorange]
+	[\c!x=FEEEC1]
+
+%D To change the colour scheme a custom palet can be defined. At the moment
+%D the module only ships with one colour scheme which is orange.
+
+\definepalet
+	[orange]
+	[slide:background=\s!white,
+	 slide:text=\s!black,
+	 slide:pagenumber=darkgray,
+	 toc:section:background=lightgray,
+	 toc:section:text:active=\s!black,
+	 toc:section:text:inactive=darkgray,
+	 slide:title:background=orange,
+	 slide:title:text=\s!black,
+	 block:background=lightorange,
+	 block:title:background=orange,
+	 block:title:text=\s!black,
+	 block:text=\s!black,
+	 block:shadow=lightorange]
+
+\setuppalet
+	[\moduleparameter{\c!slide}{\c!palet}]
+
+%D \stopsection
+
+%D \startsection [title=Footer]
+
+\setupfooter
+	[\c!style=\c!small,
+	 \c!color=slide:pagenumber]
+
+%D The footer simply contains the current slide number and the total number of
+%D slides. This might be the place to add additional information like
+%D organisation or author name.
+%D
+%D \useURL[visualcounter] [https://github.com/adityam/visualcounter] [] [visualcounter module]
+%D
+%D This would be a good place to hook Adityas \from[visualcounter]
+%D into the slides.
+
+\setupfootertexts
+	[]
+	[\userpagenumber\thinspace/\thinspace\lastuserpage]
+
+%D \stopsection
+
+%D \startsection [title=Font setup]
+
+\setupbodyfont
+	[\moduleparameter{\c!slide}{\c!style},
+	 \moduleparameter{\c!slide}{\c!size}]
+
+%D Enable font expansion and protrusion. Not really necessary for a slide
+%D show.
+
+\setupalign
+	[\v!hz, \v!hanging]
+
+\definefontfeature
+	[\v!default] [\v!default]
+	[protrusion=quality, expansion=quality]
+
+%D \stopsection
+
+%D \startsection [title=Typography]
+%D
+%D Since the are not supposed to be any paragraphs on the slides, a paragraph
+%D indentation is not necessary.
+
+\setupindenting
+	[\v!no]
+
+\setupwhitespace
+	[\v!medium]
+
+\setuptolerance
+	[\v!verytolerant]
+
+\setupinterlinespace
+	[\c!line=3\exheight]
+
+\setuphyphenmark
+	[\c!sign=\v!normal]
+
+\setbreakpoints
+	[compound]
+
+\definehighlight
+	[emph]
+	[\c!style=\v!em]
+
+\setupunits
+	[\c!unit]
+	[\c!space=\v!small]
+
+%D \stopsection
+
+%D \startsection [title=Interaction]
+%D
+%D The values set with \tex{setupdocument} are being reused here. They appear
+%D in the PDF meta data, which makes sense in case the slide show is being
+%D published.
+
+\setupinteraction
+	[\c!state=\v!start,
+	 \c!title=\documentvariable{\c!title},
+	 \c!subtitle=\documentvariable{\c!subtitle},
+	 \c!author=\documentvariable{\c!author},
+	 \c!style=,
+	 \c!color=slide:text,
+	 \c!contrastcolor=slide:text]
+
+\setupdocument
+	[metadata:author=\documentvariable{\c!author},
+	 metadata:title=\documentvariable{\c!title},
+	 metadata:subtitle=\documentvariable{\c!subtitle}]
+
+%D \stopsection
+
+%D \startsection [title=Shading]
+%D
+%D This overlay is used for the top navigation bar.
+
+\defineoverlay
+	[mp:shading:overlay]
+	[\useMPgraphic{slide::mp:shading:overlay}]
+
+%D This layer contains the shading for the top navigation bar which is placed
+%D behind the section list.
+
+\definelayer
+	[layer:top:shading]
+	[\c!state=\v!repeat]
+
+\setlayerframed
+	[layer:top:shading]
+	[\c!width=\paperwidth,
+	 \c!height=\dimexpr\measure{tocbar:section:height}+\measure{slide:title:height}\relax,
+	 \c!background=mp:shading:overlay,
+	 \c!backgroundcolor=toc:section:background,
+	 \c!frame=\v!off]
+	 {}
+
+%D \stopsection
+
+%D \startsection [title=Navigation Bar]
+%D This layer contains section list in the top navigation bar.
+
+\definelayer
+	[layer:toc:section]
+	[\c!state=\v!start]
+
+\startsetups [layer:toc:section:setups]
+	\setlayerframed
+		[layer:toc:section]
+		[\c!width=\paperwidth,
+		 \c!height=\measure{tocbar:section:height},
+		 \c!foregroundstyle=\tfxx,
+		 \c!offset=\v!none,
+		 \c!frame=\v!off]
+		{\placelist [\c!section] [\c!alternative=toc:section, \c!criterium=\v!all]}
+\stopsetups
+
+\definelistalternative
+	[toc:section]
+	[\c!renderingsetup=list:toc:section]
+
+%D The \tex{hbox} is necessary to enable interactive content.
+
+\startsetups [list:toc:section]
+	\hfill
+	\hbox \strc_lists_get_reference_attribute\v!all
+		{\doifelse\currentlistentrylocation{\namedstructureheadlocation{\c!section}}
+			{\color[toc:section:text:active]   {\currentlistentrytitle}}
+			{\color[toc:section:text:inactive] {\currentlistentrytitle}}}
+	\hfill
+	\null
+\stopsetups
+
+%D \stopsection
+
+%D \startsection [title=Slide title]
+%D
+%D The following code is not the title page, but the slide title which is
+%D placed underneath the section navigation at the top. The
+%D \type{state=continue} places the title from the previous slide if none is
+%D provided for the current slide.
+
+\definelayer
+	[layer:\c!slide\c!title]
+	[\c!state=\v!continue,
+	 \c!voffset=\measure{tocbar:section:height}]
+
+\startsetups [layer:slidetitle:setups]
+	\setlayerframed
+		[layer:\c!slide\c!title]
+		[\c!width=\paperwidth,
+		 \c!height=\measure{slide:title:height},
+		 \c!background=\c!color,
+		 \c!backgroundcolor=slide:title:background,
+		 \c!foregroundcolor=slide:title:text,
+		 \c!foregroundstyle=\tfb,
+		 \c!frame=\v!off]
+		{\setups{\c!slide\c!title}}
+\stopsetups
+
+\startsetups [\c!slide\c!title]
+	\getmarking [\c!slide] [\v!last]
+\stopsetups
+
+%D \stopsection
+
+%D \startsection [title=Title page]
+%D
+%D This sets up the first page of the slide show. The \tex{setuptitle} macros
+%D are provided by Wolfgangs \from[title].
+
+\setuptitle
+	[\c!title]
+	[\c!style=\tfc]
+
+\setuptitle
+	[\c!author=\documentvariable{\c!author},
+	 \c!title=\setups{titlepage:title},
+	 \c!date=\documentvariable{\c!date}]
+
+\defineframed
+	[titlepage_frame_title]
+	[\c!width=.8\textwidth,
+	 \c!align={\v!normal, \v!middle},
+	 \c!frame=\v!off,
+	 \c!background={\c!color, mp:dropshadow},
+	 \c!backgroundcolor=slide:title:background,
+	 \c!foregroundcolor=slide:title:text,
+	 \c!corner=\v!round,
+	 \c!radius=\moduleparameter{\c!slide}{\c!radius},
+	 \c!offset=.8cm]
+
+\startsetups [titlepage:title]
+	\startlinealignment [\v!middle]
+		\titlepage_frame_title{\documentvariable{\c!title}}
+	\stoplinealignment
+\stopsetups
+
+%D This places the title page at the beginning of every slide show.
+
+\setupdocument
+	[\c!before=\setups{setups:titlepage}]
+
+\startsetups [setups:titlepage]
+	\startstandardmakeup
+		\placetitle
+		\vfill
+	\stopstandardmakeup
+\stopsetups
+
+%D \stopsection
+
+%D \startsection [title=Structuring]
+%D
+%D Create a new head for the slide. Each slide is technically a subsection and
+%D placed as a new page. The section serves to divide the text and generate
+%D the top navigation bar.
+
+\definehead
+	[\c!slide]
+	[\v!subsection]
+
+\setuphead
+	[\v!section, \v!subsection, \c!slide]
+	[\c!page=\v!yes,
+	 \c!placehead=\v!empty,
+	 \c!before=,
+	 \c!after=]
+
+%D \stopsection
+
+%D \startsection [title=Blocks]
+%D
+%D Blocks are text objects that are supposed to stand out in some way. They
+%D have a background and, depending on the configuration, a rounded corner.
+%D Blocks might also have a title, but it is optional.
+%D
+%D The block shading can be turned off.
+
+\defineoverlay
+	[mp:block:title]
+	[\doifelse{\moduleparameter{\c!slide}{\c!blockshading}}%%
+	 {\v!yes}%%
+	 {\startMPdefinitions{\c!slide} blockshading := true  \stopMPdefinitions}%%
+	 {\startMPdefinitions{\c!slide} blockshading := false \stopMPdefinitions}%%
+	 \useMPgraphic{slide::mp:block:title}]
+
+%D This is the framed text for the title. It is not used if no title is
+%D provided.
+
+\defineframedtext
+	[block_framed_title]
+	[\c!offset=\v!none,
+	 \c!width=\hsize,
+	 \c!boffset=.3\exheight,
+	 \c!toffset=.5\exheight,
+	 \c!loffset=\exheight,
+	 \c!backgrounddepth=\onepoint,
+	 \c!frame=\v!off,
+	 \c!radius=\moduleparameter{\c!slide}{\c!radius},
+	 \c!background={mp:block:title, mp:dropshadow:toppart},
+	 \c!backgroundcolor=block:title:background,
+	 \c!foregroundcolor=block:title:text]
+
+%D This is the framed text for the main content of the block. Two versions are
+%D distinguished, one with title and one without. This is the version with
+%D title. It has a straight top edge to seamlessly connect to the title.
+
+\defineframedtext
+	[block_framed_with_title]
+	[\c!offset=\exheight,
+	 \c!width=\hsize,
+	 \c!frame=\v!off,
+	 \c!radius=\moduleparameter{\c!slide}{\c!radius},
+	 \c!backgroundcorner=\@ne,
+	 \c!background={\c!color, mp:dropshadow:bottompart},
+	 \c!backgroundcolor=block:background,
+	 \c!foregroundcolor=block:title:text]
+
+%D This is the version without title. The top edge looks the same as the
+%D bottom.
+
+\defineframedtext
+	[block_framed_no_title]
+	[\c!offset=\exheight,
+	 \c!width=\hsize,
+	 \c!frame=\v!off,
+	 \c!corner=\v!round,
+	 \c!radius=\moduleparameter{\c!slide}{\c!radius},
+	 \c!background={\c!color, mp:dropshadow},
+	 \c!backgroundcolor=block:background,
+	 \c!foregroundcolor=block:title:text]
+
+%D This defines a collector to position the title and the block content. I
+%D feel like there should be a simpler solution and that I am
+%D over-complicating things a little here. Improvements are welcome.
+%D Anyway, this solution works nad that's the most important thing.
+
+\definecollector
+	[block:collector]
+
+\defineannotation
+	[block]
+	[\c!alternative=\v!command,
+	 \v!command=\block_annotation_command]
+
+\starttexdefinition unexpanded block_annotation_command #first #second
+	\doifsomethingelse{\placeannotationtitle}%%
+	{
+		\setcollector
+			[block:collector]
+			{\startblock_framed_title
+				 \placeannotationtitle
+			 \stopblock_framed_title}
+
+		\setcollector
+			[block:collector]
+			[\c!corner={\v!bottom, \v!left},
+			 \c!location={\v!bottom, \v!right}]
+			{\startblock_framed_with_title
+				 \placeannotationcontent
+			 \stopblock_framed_with_title}
+	}{
+		\setcollector
+			[block:collector]
+			[\c!corner={\v!bottom, \v!left},
+			 \c!location={\v!bottom, \v!right}]
+			{\startblock_framed_no_title
+				 \placeannotationcontent
+			 \stopblock_framed_no_title}
+	}
+
+%D This places the collector containing the title and the block content.
+
+	\flushcollector
+		[block:collector]
+\stoptexdefinition
+
+%D \stopsection
+
+%D \startsection [title=Drop shadow]
+%D
+%D Some eye-candy which is not strictly necessary and can be deactivated in
+%D the module configuration. The drop shadow code is divided into three parts.
+%D The top part is for the title of the block. The bottom part is for the
+%D lower part and full is used to draw a shadow behind single non-divided
+%D objects.
+
+\defineoverlay
+	[mp:dropshadow]
+	[\doif{\moduleparameter{\c!slide}{\c!shadow}}%%
+	 {\v!yes}%%
+	 {\useMPgraphic{slide::mp:dropshadow:full}}]
+
+\defineoverlay
+	[mp:dropshadow:toppart]
+	[\doif{\moduleparameter{\c!slide}{\c!shadow}}%%
+	 {\v!yes}%%
+	 {\useMPgraphic{slide::mp:dropshadow:toppart}}]
+
+\defineoverlay
+	[mp:dropshadow:bottompart]
+	[\doif{\moduleparameter{\c!slide}{\c!shadow}}%%
+	 {\v!yes}%%
+	 {\useMPgraphic{slide::mp:dropshadow:bottompart}}]
+
+%D \stopsection
+
+%D \startsection [title=External figures]
+%D
+%D It is convenient to resize the included images to a size slightly smaller
+%D than the available size.
+
+\setupexternalfigures
+	[\c!width=.95\hsize,
+	 \c!height=.95\vsize,
+	 \c!factor=\v!fit]
+
+%D The \quotation{shadow} preset can be used to draw a shadow behind included
+%D images. It is the same shadow as the one used for text blocks.
+
+\defineexternalfigure
+	[\c!shadow]
+	[\c!background=mp:dropshadow,
+	 \c!radius=\moduleparameter{\c!slide}{\c!radius},
+	 \c!corner=\v!round]
+
+%D \stopsection
+
+%D \startsection [title=Lists and descriptions]
+%D
+%D The defaults are not really suitable for a slide show.
+
+\setupitemize
+	[\v!packed]
+
+\definedescription
+	[description]
+	[\c!alternative=\v!hanging,
+	 \c!width=\v!broad]
+
+%D \stopsection
+
+\protect
+
+\stopmodule
+
+%S B
+\continueifinputfile{t-slide.mkvi}
+
+\usemodule [ipsum]
+
+\setupexternalfigures
+	[location=default]
+
+\setupdocument
+	[title={\ipsum[alternative=lines, n=1]},
+	 author=Your name]
+
+\startdocument
+
+\defineipsum
+	[ward]
+	[file=ward]
+
+\defineipsum
+	[ward:itemize]
+	[ward]
+	[alternative=lines,
+	 before=\startitemize,
+	 after=\stopitemize,
+	 left=\startitem,
+	 right=\stopitem]
+
+\starttexdefinition DoPlaceContent #Title
+	\startsection [title=#Title]
+
+	\startslide [title=#Title]
+		\ipsum [ward]
+	\stopslide
+
+	\startslide [title=Block]
+		\startblock
+			\ipsum [ward]
+		\stopblock
+	\stopslide
+
+	\startslide [title=Block Title]
+		\startblock [title=#Title]
+			\ipsum [ward]
+		\stopblock
+		\ipsum [ward:itemize]
+	\stopslide
+
+	\startslide [title=#Title]
+		\startsimplecolumns
+			\startblock [title=#Title]
+				\ipsum [ward]
+			\stopblock
+			\startblock [title=Animals]
+				\externalfigure [cow]
+			\stopblock
+		\stopsimplecolumns
+	\stopslide
+
+	\startslide [title=Figure]
+		\startlinealignment [middle]
+			\externalfigure [cow] [shadow] [frame=on]
+		\stoplinealignment
+	\stopslide
+
+	\stopsection
+\stoptexdefinition
+
+\processcommacommand
+	[Alpha, Beta, Gamma, Delta]
+	\DoPlaceContent
+
+\stopdocument
+%S E
