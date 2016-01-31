@@ -1,6 +1,6 @@
 %D \module
 %D   [     file=t-slide,
-%D      version=2012.11.12,
+%D      version=2016.01.31,
 %D        title=\CONTEXT\ User Module,
 %D     subtitle=Slide,
 %D       author=Marco Patzer,
@@ -30,39 +30,42 @@
 \stopMPdefinitions
 
 \startuseMPgraphic{slide::mp:shading:overlay}
-	path p; p:=fullsquare xyscaled (\overlaywidth, \overlayheight);
+	path p; p:=fullsquare xyscaled (OverlayWidth, OverlayHeight);
 	fill p
-		withshading("linear", ulcorner p, llcorner p)
-		withfromshadecolor \MPcolor{\overlaycolor}
-		withtoshadecolor   \MPcolor{c:transparent};
+		withshademethod "linear"
+		withshadevector (0, 3)
+		withshadecolors (\MPcoloronly{slide:background}, OverlayColor);
 \stopuseMPgraphic
 
 \startuseMPgraphic{slide::mp:block:title}
 	offset := \moduleparameter{slide}{radius};
+
 	path p; p :=
-		origin                                      -- (\overlaywidth, 0)                     --
-		(\overlaywidth, \overlayheight-offset) {up} .. (\overlaywidth-offset, \overlayheight) --
-		(offset, \overlayheight) {left}             .. (0, \overlayheight-offset)             --
-		origin                                      .. cycle;
+		origin                                    -- (OverlayWidth, 0)                    --
+		(OverlayWidth, OverlayHeight-offset) {up} .. (OverlayWidth-offset, OverlayHeight) --
+		(offset, OverlayHeight) {left}            .. (0, OverlayHeight-offset)            --
+		origin                                    .. cycle;
+
+	p := p yshifted .5OverlayHeight;
 
 	fill p
 		if blockshading :
-			withshading("linear", ulcorner p, llcorner p)
-			withfromshadecolor \MPcolor{\overlaycolor}
-			withtoshadecolor   \MPcolor{block:background}
+			withshademethod "linear"
+			withshadevector (0, 5)
+			withshadecolors (\MPcoloronly{block:background}, OverlayColor)
 		else :
-			withcolor \MPcolor{\overlaycolor}
+			withcolor OverlayColor
 		fi;
 \stopuseMPgraphic
 
 \startuseMPgraphic{slide::mp:dropshadow:common}
-	w      := \overlaywidth-.5pt;
-	h      := \overlayheight-.5pt;
+	w      := OverlayWidth-.5pt;
+	h      := OverlayHeight-.5pt;
 	radius := \framedparameter{radius};
 	radius := \moduleparameter{slide}{radius};
 
-	color col;
-	col := .05[\MPcolor{block:shadow}, black];
+	color c;
+	c := .05[\MPcolor{block:shadow}, black];
 
 	pair ll, lr, ur;
 	ll := -.5(w,  h);
@@ -72,10 +75,17 @@
 	path bborig;
 	bborig := fullsquare xyscaled (w, h);
 
-	path bottom_left, bottom_middle, corner, right_middle, right_bottomfull, right_top, right_topfull;
+	path
+		bottom_left,
+		bottom_middle,
+		corner,
+		right_middle,
+		right_bottomfull,
+		right_top,
+		right_topfull;
 
 	bottom_left = ll + (radius, 0) -- ll + (2radius, 0) --
-	ll + (radius + radius, -radius) {left} .. cycle;
+		ll + (radius + radius, -radius) {left} .. cycle;
 
 	bottom_middle = ll + (2radius, 0) -- lr + (-radius, 0) --
 		lr+ (-radius, -radius) -- ll + (2radius, -radius) .. cycle;
@@ -89,7 +99,7 @@
 	right_bottomfull = lr -- lr + (radius, 0) --
 		ur + (radius, -2radius) -- ur + (0, -2radius) .. cycle;
 
-	right_top = ur + (0, -radius-radius) -- ur + (radius, -2radius) {up} ..
+	right_top = ur + (0, -2radius) -- ur + (radius, -2radius) {up} ..
 		ur + (0, -radius) -- cycle;
 
 	right_topfull = lr + (0, radius) -- lr + (radius, radius) --
@@ -101,14 +111,18 @@
 	\includeMPgraphic{slide::mp:dropshadow:common}
 
 	fill right_bottomfull
-		withshading("linear", llcorner right_bottomfull, lrcorner right_bottomfull)
-		withfromshadecolor col
-		withtoshadecolor   \MPcolor{c:transparent};
+		withshademethod "linear"
+		withshadevector (0, 1)
+		withshadecolors (c, \MPcoloronly{slide:background});
 
 	fill right_top
-		withshading("circular", llcorner right_top, llcorner right_top, radius, 0)
-		withfromshadecolor \MPcolor{c:transparent}
-		withtoshadecolor   col;
+		withshademethod "circular"
+		withshadefactor 1
+		withprescript "sh_center_a=" & ddecimal llcorner right_top
+		withprescript "sh_center_b=" & ddecimal llcorner right_top
+		withprescript "sh_radius_a=" & decimal radius
+		withprescript "sh_radius_b=" & decimal 0cm
+		withshadecolors (\MPcoloronly{slide:background}, c);
 
 	setbounds currentpicture to bborig;
 \stopuseMPgraphic
@@ -118,29 +132,32 @@
 	\includeMPgraphic{slide::mp:dropshadow:common}
 
 	fill bottom_left
-		withshading("circular", urcorner bottom_left, urcorner bottom_left, radius, 0)
-		withfromshadecolor \MPcolor{c:transparent}
-		withtoshadecolor   col;
+		withshademethod "circular"
+		withshadefactor 1
+		withprescript "sh_center_a=" & ddecimal urcorner bottom_left
+		withprescript "sh_center_b=" & ddecimal urcorner bottom_left
+		withprescript "sh_radius_a=" & decimal radius
+		withprescript "sh_radius_b=" & decimal 0cm
+		withshadecolors (\MPcoloronly{slide:background}, c);
 
 	fill bottom_middle
-		withshading("linear", ulcorner bottom_middle, llcorner bottom_middle)
-		withfromshadecolor col
-		withtoshadecolor   \MPcolor{c:transparent};
+		withshademethod "linear"
+		withshadevector (0, 3)
+		withshadecolors (c, \MPcoloronly{slide:background});
 
 	fill corner
-		withshading("circular", ulcorner corner, ulcorner corner, 2radius, radius)
-		withfromshadecolor \MPcolor{c:transparent}
-		withtoshadecolor   col;
+		withshademethod "circular"
+		withshadefactor 1
+		withprescript "sh_center_a=" & ddecimal ulcorner corner
+		withprescript "sh_center_b=" & ddecimal ulcorner corner
+		withprescript "sh_radius_a=" & decimal 2radius
+		withprescript "sh_radius_b=" & decimal radius
+		withshadecolors (\MPcoloronly{slide:background}, c);
 
 	fill right_topfull
-		withshading("linear", llcorner right_topfull, lrcorner right_topfull)
-		withfromshadecolor col
-		withtoshadecolor   \MPcolor{c:transparent};
-
-	fill right_top
-		withshading("circular", llcorner right_top, llcorner right_top, radius, 0)
-		withfromshadecolor \MPcolor{c:transparent}
-		withtoshadecolor   col;
+		withshademethod "linear"
+		withshadevector (0, 1)
+		withshadecolors (c, \MPcoloronly{slide:background});
 
 	setbounds currentpicture to bborig;
 \stopuseMPgraphic
@@ -150,29 +167,41 @@
 	\includeMPgraphic{slide::mp:dropshadow:common}
 
 	fill bottom_left
-		withshading("circular", urcorner bottom_left, urcorner bottom_left, radius, 0)
-		withfromshadecolor \MPcolor{c:transparent}
-		withtoshadecolor   col;
+		withshademethod "circular"
+		withshadefactor 1
+		withprescript "sh_center_a=" & ddecimal urcorner bottom_left
+		withprescript "sh_center_b=" & ddecimal urcorner bottom_left
+		withprescript "sh_radius_a=" & decimal radius
+		withprescript "sh_radius_b=" & decimal 0cm
+		withshadecolors (\MPcoloronly{slide:background}, c);
 
 	fill bottom_middle
-		withshading("linear", ulcorner bottom_middle, llcorner bottom_middle)
-		withfromshadecolor col
-		withtoshadecolor   \MPcolor{c:transparent};
+		withshademethod "linear"
+		withshadevector (0, 3)
+		withshadecolors (c, \MPcoloronly{slide:background});
 
 	fill corner
-		withshading("circular", ulcorner corner, ulcorner corner, 2radius, radius)
-		withfromshadecolor \MPcolor{c:transparent}
-		withtoshadecolor   col;
+		withshademethod "circular"
+		withshadefactor 1
+		withprescript "sh_center_a=" & ddecimal ulcorner corner
+		withprescript "sh_center_b=" & ddecimal ulcorner corner
+		withprescript "sh_radius_a=" & decimal 2radius
+		withprescript "sh_radius_b=" & decimal radius
+		withshadecolors (\MPcoloronly{slide:background}, c);
 
 	fill right_middle
-		withshading("linear", llcorner right_middle, lrcorner right_middle)
-		withfromshadecolor col
-		withtoshadecolor   \MPcolor{c:transparent};
+		withshademethod "linear"
+		withshadevector (0, 1)
+		withshadecolors (c, \MPcoloronly{slide:background});
 
 	fill right_top
-		withshading("circular", llcorner right_top, llcorner right_top, radius, 0)
-		withfromshadecolor \MPcolor{c:transparent}
-		withtoshadecolor   col;
+		withshademethod "circular"
+		withshadefactor 1
+		withprescript "sh_center_a=" & ddecimal llcorner right_top
+		withprescript "sh_center_b=" & ddecimal llcorner right_top
+		withprescript "sh_radius_a=" & decimal radius
+		withprescript "sh_radius_b=" & decimal 0cm
+		withshadecolors (\MPcoloronly{slide:background}, c);
 
 	setbounds currentpicture to bborig;
 \stopuseMPgraphic
