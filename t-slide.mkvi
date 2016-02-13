@@ -1,6 +1,6 @@
 %D \module
 %D   [     file=t-slide,
-%D      version=2016.01.31,
+%D      version=2016.02.13,
 %D        title=\CONTEXT\ User Module,
 %D     subtitle=Slide,
 %D       author=Marco Patzer,
@@ -29,7 +29,7 @@
 %D
 %D \startsection [title=Module setup]
 
-\writestatus{loading}{ConTeXt User Module / Slide (ver: 2016.01.31)}
+\writestatus{loading}{ConTeXt User Module / Slide (ver: 2016.02.13)}
 
 \startmodule [slide]
 
@@ -158,7 +158,7 @@
 	 block:shadow=lightorange]
 
 \setuppalet
-	[\moduleparameter{\c!slide}{\c!palet}]
+	[\moduleparameter{slide}{\c!palet}]
 
 %D \stopsection
 
@@ -186,8 +186,8 @@
 %D \startsection [title=Font setup]
 
 \setupbodyfont
-	[\moduleparameter{\c!slide}{\c!style},
-	 \moduleparameter{\c!slide}{\c!size}]
+	[\moduleparameter{slide}{\c!style},
+	 \moduleparameter{slide}{\c!size}]
 
 %D Enable font expansion and protrusion. Not really necessary for a slide
 %D show.
@@ -326,13 +326,13 @@
 %D provided for the current slide.
 
 \definelayer
-	[layer:\c!slide\c!title]
+	[layer:slide:title]
 	[\c!state=\v!continue,
 	 \c!voffset=\measure{tocbar:section:height}]
 
-\startsetups [layer:slidetitle:setups]
+\startsetups [layer:slide:title:setups]
 	\setlayerframed
-		[layer:\c!slide\c!title]
+		[layer:slide:title]
 		[\c!width=\paperwidth,
 		 \c!height=\measure{slide:title:height},
 		 \c!background=\c!color,
@@ -340,10 +340,10 @@
 		 \c!foregroundcolor=slide:title:text,
 		 \c!foregroundstyle=\tfb,
 		 \c!frame=\v!off]
-		{\setups{\c!slide\c!title}}
+		{\setups{slide:title}}
 \stopsetups
 
-\startsetups [\c!slide\c!title]
+\startsetups [slide:title]
 	\getmarking [\c!slide] [\v!last]
 \stopsetups
 
@@ -372,7 +372,7 @@
 	 \c!backgroundcolor=slide:title:background,
 	 \c!foregroundcolor=slide:title:text,
 	 \c!corner=\v!round,
-	 \c!radius=\moduleparameter{\c!slide}{\c!radius},
+	 \c!radius=\moduleparameter{slide}{\c!radius},
 	 \c!offset=.8cm]
 
 \startsetups [titlepage:title]
@@ -424,10 +424,10 @@
 
 \defineoverlay
 	[mp:block:title]
-	[\doifelse{\moduleparameter{\c!slide}{\c!blockshading}}%%
+	[\doifelse{\moduleparameter{slide}{\c!blockshading}}%%
 	 {\v!yes}%%
-	 {\startMPdefinitions{\c!slide} blockshading := true  \stopMPdefinitions}%%
-	 {\startMPdefinitions{\c!slide} blockshading := false \stopMPdefinitions}%%
+	 {\startMPdefinitions{slide} blockshading := true  \stopMPdefinitions}%%
+	 {\startMPdefinitions{slide} blockshading := false \stopMPdefinitions}%%
 	 \useMPgraphic{slide::mp:block:title}]
 
 %D This is the framed text for the title. It is not used if no title is
@@ -443,7 +443,7 @@
 	 \c!backgrounddepth=\onepoint,
 	 \c!frame=\v!off,
 	 \c!rulethickness=\zeropoint,
-	 \c!radius=\moduleparameter{\c!slide}{\c!radius},
+	 \c!radius=\moduleparameter{slide}{\c!radius},
 	 \c!background={mp:block:title, mp:dropshadow:toppart},
 	 \c!backgroundcolor=block:title:background,
 	 \c!foregroundcolor=block:title:text]
@@ -458,7 +458,7 @@
 	 \c!width=\hsize,
 	 \c!frame=\v!off,
 	 \c!rulethickness=\zeropoint,
-	 \c!radius=\moduleparameter{\c!slide}{\c!radius},
+	 \c!radius=\moduleparameter{slide}{\c!radius},
 	 \c!backgroundcorner=\@ne,
 	 \c!background={\c!color, mp:dropshadow:bottompart},
 	 \c!backgroundcolor=block:background,
@@ -474,7 +474,7 @@
 	 \c!frame=\v!off,
 	 \c!rulethickness=\zeropoint,
 	 \c!corner=\v!round,
-	 \c!radius=\moduleparameter{\c!slide}{\c!radius},
+	 \c!radius=\moduleparameter{slide}{\c!radius},
 	 \c!background={\c!color, mp:dropshadow},
 	 \c!backgroundcolor=block:background,
 	 \c!foregroundcolor=block:title:text]
@@ -538,19 +538,19 @@
 
 \defineoverlay
 	[mp:dropshadow]
-	[\doif{\moduleparameter{\c!slide}{\c!shadow}}%%
+	[\doif{\moduleparameter{slide}{\c!shadow}}%%
 	 {\v!yes}%%
 	 {\useMPgraphic{slide::mp:dropshadow:full}}]
 
 \defineoverlay
 	[mp:dropshadow:toppart]
-	[\doif{\moduleparameter{\c!slide}{\c!shadow}}%%
+	[\doif{\moduleparameter{slide}{\c!shadow}}%%
 	 {\v!yes}%%
 	 {\useMPgraphic{slide::mp:dropshadow:toppart}}]
 
 \defineoverlay
 	[mp:dropshadow:bottompart]
-	[\doif{\moduleparameter{\c!slide}{\c!shadow}}%%
+	[\doif{\moduleparameter{slide}{\c!shadow}}%%
 	 {\v!yes}%%
 	 {\useMPgraphic{slide::mp:dropshadow:bottompart}}]
 
@@ -572,7 +572,7 @@
 \defineexternalfigure
 	[\c!shadow]
 	[\c!background=mp:dropshadow,
-	 \c!radius=\moduleparameter{\c!slide}{\c!radius},
+	 \c!radius=\moduleparameter{slide}{\c!radius},
 	 \c!corner=\v!round]
 
 %D \stopsection
