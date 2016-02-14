@@ -1,6 +1,6 @@
 %D \module
 %D   [     file=t-slide,
-%D      version=2016.02.13,
+%D      version=2016.02.14,
 %D        title=\CONTEXT\ User Module,
 %D     subtitle=Slide,
 %D       author=Marco Patzer,
@@ -29,7 +29,7 @@
 %D
 %D \startsection [title=Module setup]
 
-\writestatus{loading}{ConTeXt User Module / Slide (ver: 2016.02.13)}
+\writestatus{loading}{ConTeXt User Module / Slide (ver: 2016.02.14)}
 
 \startmodule [slide]
 
@@ -290,7 +290,7 @@
 	[\c!state=\v!start]
 
 \startsetups [layer:toc:section:setups]
-	\setlayerframed
+\setlayerframed
 		[layer:toc:section]
 		[\c!width=\paperwidth,
 		 \c!height=\measure{tocbar:section:height},
@@ -430,23 +430,32 @@
 	 {\startMPdefinitions{slide} blockshading := false \stopMPdefinitions}%%
 	 \useMPgraphic{slide::mp:block:title}]
 
+%D This is the frame definition for the mutual values. The others are derived
+%D from this one.
+
+\defineframedtext
+	[block_framed_common]
+	[\c!offset=\exheight,
+	 \c!width=\hsize,
+	 \c!frame=\v!off,
+	 \c!rulethickness=\zeropoint,
+	 \c!radius=\moduleparameter{slide}{\c!radius},
+	 \c!backgroundcolor=block:background,
+	 \c!foregroundcolor=block:title:text]
+
 %D This is the framed text for the title. It is not used if no title is
 %D provided.
 
 \defineframedtext
 	[block_framed_title]
+	[block_framed_common]
 	[\c!offset=\v!none,
-	 \c!width=\hsize,
 	 \c!boffset=.3\exheight,
 	 \c!toffset=.5\exheight,
 	 \c!loffset=\exheight,
 	 \c!backgrounddepth=\onepoint,
-	 \c!frame=\v!off,
-	 \c!rulethickness=\zeropoint,
-	 \c!radius=\moduleparameter{slide}{\c!radius},
 	 \c!background={mp:block:title, mp:dropshadow:toppart},
-	 \c!backgroundcolor=block:title:background,
-	 \c!foregroundcolor=block:title:text]
+	 \c!backgroundcolor=block:title:background]
 
 %D This is the framed text for the main content of the block. Two versions are
 %D distinguished, one with title and one without. This is the version with
@@ -454,30 +463,18 @@
 
 \defineframedtext
 	[block_framed_with_title]
-	[\c!offset=\exheight,
-	 \c!width=\hsize,
-	 \c!frame=\v!off,
-	 \c!rulethickness=\zeropoint,
-	 \c!radius=\moduleparameter{slide}{\c!radius},
-	 \c!backgroundcorner=\@ne,
-	 \c!background={\c!color, mp:dropshadow:bottompart},
-	 \c!backgroundcolor=block:background,
-	 \c!foregroundcolor=block:title:text]
+	[block_framed_common]
+	[\c!backgroundcorner=\@ne,
+	 \c!background={\c!color, mp:dropshadow:bottompart}]
 
 %D This is the version without title. The top edge looks the same as the
 %D bottom.
 
 \defineframedtext
 	[block_framed_no_title]
-	[\c!offset=\exheight,
-	 \c!width=\hsize,
-	 \c!frame=\v!off,
-	 \c!rulethickness=\zeropoint,
-	 \c!corner=\v!round,
-	 \c!radius=\moduleparameter{slide}{\c!radius},
-	 \c!background={\c!color, mp:dropshadow},
-	 \c!backgroundcolor=block:background,
-	 \c!foregroundcolor=block:title:text]
+	[block_framed_common]
+	[\c!corner=\v!round,
+	 \c!background={\c!color, mp:dropshadow}]
 
 %D This defines a collector to position the title and the block content. I
 %D feel like there should be a simpler solution and that I am
